@@ -1,0 +1,78 @@
+import { NextResponse } from "next/server";
+import { z } from "zod";
+
+import { isAdminSession } from "@/lib/admin";
+import { prisma } from "@/lib/prisma";
+import { makeSlug } from "@/lib/utils";
+
+const updateProductSchema = z.object({
+  name: z.string().min(2),
+  description: z.string().min(10),
+  price: z.coerce.number().positive(),
+  comparePrice: z.coerce.number().optional().nullable(),
+  stock: z.coerce.number().int().min(0),
+  categoryId: z.string().min(1),
+  images: z.array(z.string().url()).min(1),
+  videoUrl: z.string().url().optional().or(z.literal("")),
+  isActive: z.boolean().default(true),
+  isFeatured: z.boolean().default(false)
+});
+
+const patchProductSchema = z.object({
+  isActive: z.boolean().optional(),
+  isFeatured: z.boolean().optional()
+});
+
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
+  if (!(await isAdminSession())) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const parsed = updateProductSchema.safeParse(body);
+
+  if (!parsed.success) {
+    return NextResponse.json({ message: "Invalid product details" }, { status: 400 });
+  }
+
+  const product = await prisma.product.update({
+    where: { id: params.id },
+    data: {
+      ...parsed.data,
+      slug: makeSlug(parsed.data.name),
+      videoUrl: parsed.data.videoUrl || null
+    }
+  });
+
+  return NextResponse.json({ product });
+}
+
+export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+  if (!(await isAdminSession())) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const parsed = patchProductSchema.safeParse(body);
+
+  if (!parsed.success) {
+    return NextResponse.json({ message: "Invalid product update" }, { status: 400 });
+  }
+
+  const product = await prisma.product.update({
+    where: { id: params.id },
+    data: parsed.data
+  });
+
+  return NextResponse.json({ product });
+}
+
+export async function DELETE(_: Request, { params }: { params: { id: string } }) {
+  if (!(await isAdminSession())) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  await prisma.product.delete({ where: { id: params.id } });
+
+  return NextResponse.json({ ok: true });
+}
