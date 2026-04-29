@@ -84,9 +84,14 @@ export function HomePageClient({
     show: { opacity: 1, y: 0 }
   };
 
+  // Ensure we have valid data arrays to prevent rendering issues
+  const safeFeaturedProducts = Array.isArray(featuredProducts) ? featuredProducts : [];
+  const safeCategories = Array.isArray(categories) ? categories : [];
+  const safeNewArrivals = Array.isArray(newArrivals) ? newArrivals : [];
+
   return (
     <>
-      <section className="art-hero-gradient relative isolate flex min-h-screen items-center justify-center overflow-hidden px-4 pt-24 text-center">
+      <section key="hero" className="art-hero-gradient relative isolate flex min-h-screen items-center justify-center overflow-hidden px-4 pt-24 text-center">
         <div className="absolute left-[8%] top-[18%] h-52 w-52 rounded-full bg-blush/50 blur-[60px]" />
         <div className="absolute right-[10%] top-[16%] h-64 w-64 rounded-full bg-lavender/45 blur-[70px]" />
         <div className="absolute bottom-[10%] left-[48%] h-56 w-56 rounded-full bg-gold/40 blur-[68px]" />
@@ -156,7 +161,7 @@ export function HomePageClient({
             </Link>
           </div>
           <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-4 lg:mx-0 lg:grid lg:auto-rows-[180px] lg:grid-cols-6 lg:overflow-visible lg:px-0 lg:pb-0">
-            {categories.map((category, index) => {
+            {safeCategories.map((category, index) => {
               const accent = categoryAccent(category.slug);
 
               return (
@@ -208,7 +213,7 @@ export function HomePageClient({
             </p>
           </div>
           <div className="grid gap-5 lg:grid-cols-4">
-            {featuredProducts.map((product, index) => (
+            {safeFeaturedProducts.map((product, index) => (
               <ProductCard
                 key={product.id}
                 product={product}
@@ -278,7 +283,7 @@ export function HomePageClient({
             </Link>
           </div>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {newArrivals.map((product) => (
+            {safeNewArrivals.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
