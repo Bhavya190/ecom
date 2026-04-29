@@ -13,7 +13,7 @@ const productSchema = z.object({
   comparePrice: z.coerce.number().optional().nullable(),
   stock: z.coerce.number().int().min(0),
   categoryId: z.string().min(1),
-  images: z.array(z.string().url()).min(1),
+  images: z.array(z.string().url()).min(1).max(8),
   videoUrl: z.string().url().optional().or(z.literal("")),
   isActive: z.boolean().default(true),
   isFeatured: z.boolean().default(false)

@@ -38,12 +38,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="mx-auto grid min-h-[calc(100svh-8rem)] max-w-md place-items-center px-4 py-10">
+    <div className="mx-auto grid min-h-screen max-w-md place-items-center px-4 pb-10 pt-28">
       <form
         onSubmit={handleSubmit}
         className="w-full rounded-lg border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-950"
       >
-        <h1 className="text-2xl font-semibold">Login</h1>
+        <h1 className="font-display text-3xl font-semibold">Login</h1>
         <div className="mt-6 space-y-4">
           <Input name="email" type="email" placeholder="Email" required />
           <Input name="password" type="password" placeholder="Password" required />

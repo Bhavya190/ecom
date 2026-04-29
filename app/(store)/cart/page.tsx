@@ -14,7 +14,7 @@ export default function CartPage() {
 
   if (!items.length) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 pb-12 pt-28 sm:px-6 lg:px-8">
         <EmptyState
           title="Your cart is empty"
           message="Add a few products and they will appear here."
@@ -26,8 +26,8 @@ export default function CartPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-semibold tracking-tight">Cart</h1>
+    <div className="mx-auto max-w-7xl px-4 pb-12 pt-28 sm:px-6 lg:px-8">
+      <h1 className="font-display text-4xl font-semibold tracking-tight text-soft-black">Cart</h1>
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
         <div className="space-y-4">
           {items.map((item) => (

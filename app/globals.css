@@ -4,6 +4,14 @@
 
 :root {
   color-scheme: light;
+  --color-blush: #F9C8D0;
+  --color-peach: #FFBE98;
+  --color-lavender: #C9B8E8;
+  --color-mint: #A8D8C8;
+  --color-gold: #E8C97A;
+  --color-cream: #FDF6EC;
+  --color-charcoal: #2D2D2D;
+  --color-soft-black: #1A1A2E;
 }
 
 .dark {
@@ -15,8 +23,9 @@ html {
 }
 
 body {
-  background: #f8fafc;
-  color: #171717;
+  background: var(--color-cream);
+  color: var(--color-charcoal);
+  font-family: var(--font-dm-sans), sans-serif;
 }
 
 .dark body {
@@ -25,6 +34,83 @@ body {
 }
 
 ::selection {
-  background: #99f6e4;
-  color: #134e4a;
+  background: var(--color-blush);
+  color: var(--color-soft-black);
+}
+
+.font-display {
+  font-family: var(--font-playfair), serif;
+}
+
+.font-body {
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+h1,
+h2,
+h3,
+.page-heading,
+.product-name {
+  font-family: var(--font-playfair), serif;
+}
+
+p,
+label,
+button,
+a,
+input,
+select,
+textarea {
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+.art-hero-gradient {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(249, 200, 208, 0.9), transparent 30%),
+    radial-gradient(circle at 82% 20%, rgba(201, 184, 232, 0.85), transparent 32%),
+    radial-gradient(circle at 50% 80%, rgba(255, 190, 152, 0.85), transparent 34%),
+    linear-gradient(120deg, #FDF6EC 0%, #F9C8D0 34%, #C9B8E8 68%, #FFBE98 100%);
+  background-size: 150% 150%;
+  animation: resinFlow 18s ease-in-out infinite alternate;
+}
+
+.shimmer-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-hover::after {
+  background: linear-gradient(110deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+  content: "";
+  height: 100%;
+  left: -70%;
+  position: absolute;
+  top: 0;
+  transform: skewX(-20deg);
+  transition: left 0.65s ease;
+  width: 45%;
+}
+
+.shimmer-hover:hover::after {
+  left: 125%;
+}
+
+@keyframes resinFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

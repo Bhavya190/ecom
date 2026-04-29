@@ -36,7 +36,7 @@ type CartContextValue = {
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
-const STORAGE_KEY = "northstar-cart";
+const STORAGE_KEY = "art-by-dhruvangi-cart";
 
 function readStoredCart() {
   if (typeof window === "undefined") {

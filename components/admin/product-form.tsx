@@ -1,11 +1,22 @@
 "use client";
 
-import { useMemo } from "react";
+/* eslint-disable @next/next/no-img-element */
+
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Save, Trash2 } from "lucide-react";
+import {
+  Film,
+  Image as ImageIcon,
+  LinkIcon,
+  Plus,
+  Save,
+  Trash2,
+  UploadCloud
+} from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
+import { useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
 import { z } from "zod";
 
@@ -24,7 +35,10 @@ const productSchema = z.object({
   categoryId: z.string().min(1, "Choose a category"),
   isActive: z.boolean(),
   isFeatured: z.boolean(),
-  images: z.array(z.object({ url: z.string().url("Enter a valid image URL") })).min(1),
+  images: z
+    .array(z.object({ url: z.string().url("Enter a valid image URL") }))
+    .min(1, "Add at least one product image")
+    .max(8, "Use up to 8 images"),
   videoUrl: z.string().url("Enter a valid video URL").optional().or(z.literal(""))
 });
 
@@ -35,6 +49,51 @@ type Category = {
   name: string;
 };
 
+type UploadItem = {
+  id: string;
+  name: string;
+  preview?: string;
+  progress: number;
+  status: "uploading" | "done" | "error";
+  error?: string;
+};
+
+function id() {
+  return globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2);
+}
+
+function uploadFile(
+  file: File,
+  onProgress: (progress: number) => void
+): Promise<{ url: string; resourceType: "image" | "video" }> {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    const formData = new FormData();
+    formData.append("file", file);
+
+    request.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        onProgress(Math.round((event.loaded / event.total) * 100));
+      }
+    };
+
+    request.onload = () => {
+      const data = JSON.parse(request.responseText || "{}");
+
+      if (request.status >= 200 && request.status < 300) {
+        resolve(data);
+        return;
+      }
+
+      reject(new Error(data.message ?? "Upload failed"));
+    };
+
+    request.onerror = () => reject(new Error("Upload failed"));
+    request.open("POST", "/api/upload");
+    request.send(formData);
+  });
+}
+
 export function ProductForm({
   product,
   categories
@@ -43,11 +102,16 @@ export function ProductForm({
   categories: Category[];
 }) {
   const router = useRouter();
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [urlInput, setUrlInput] = useState("");
+  const [uploads, setUploads] = useState<UploadItem[]>([]);
+  const [videoUpload, setVideoUpload] = useState<UploadItem | null>(null);
   const {
     register,
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isSubmitting }
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -62,7 +126,7 @@ export function ProductForm({
       isFeatured: product?.isFeatured ?? false,
       images: product?.images?.length
         ? product.images.map((url) => ({ url }))
-        : [{ url: "https://picsum.photos/seed/new-product/600/600" }],
+        : [],
       videoUrl: product?.videoUrl ?? ""
     }
   });
@@ -73,7 +137,129 @@ export function ProductForm({
   });
 
   const watchedName = watch("name");
+  const videoUrl = watch("videoUrl");
   const slugPreview = useMemo(() => makeSlug(watchedName || ""), [watchedName]);
+
+  async function uploadImages(files: File[]) {
+    const remaining = Math.max(0, 8 - fields.length);
+    const accepted = files.slice(0, remaining);
+
+    if (!remaining) {
+      toast.error("Use up to 8 images per product");
+      return;
+    }
+
+    if (accepted.length < files.length) {
+      toast.error("Only 8 images are allowed per product");
+    }
+
+    for (const file of accepted) {
+      const uploadId = id();
+      const preview = URL.createObjectURL(file);
+
+      setUploads((current) => [
+        ...current,
+        { id: uploadId, name: file.name, preview, progress: 0, status: "uploading" }
+      ]);
+
+      try {
+        const result = await uploadFile(file, (progress) => {
+          setUploads((current) =>
+            current.map((item) => (item.id === uploadId ? { ...item, progress } : item))
+          );
+        });
+
+        append({ url: result.url });
+        setUploads((current) =>
+          current.map((item) =>
+            item.id === uploadId ? { ...item, progress: 100, status: "done" } : item
+          )
+        );
+      } catch (error) {
+        setUploads((current) =>
+          current.map((item) =>
+            item.id === uploadId
+              ? {
+                  ...item,
+                  status: "error",
+                  error: error instanceof Error ? error.message : "Upload failed"
+                }
+              : item
+          )
+        );
+        toast.error(error instanceof Error ? error.message : "Upload failed");
+      }
+    }
+  }
+
+  async function uploadVideo(files: File[]) {
+    const file = files[0];
+    if (!file) return;
+
+    const uploadId = id();
+    setVideoUpload({ id: uploadId, name: file.name, progress: 0, status: "uploading" });
+
+    try {
+      const result = await uploadFile(file, (progress) => {
+        setVideoUpload((current) => (current ? { ...current, progress } : current));
+      });
+      setValue("videoUrl", result.url, { shouldValidate: true });
+      setVideoUpload((current) =>
+        current ? { ...current, progress: 100, status: "done" } : current
+      );
+      toast.success("Video uploaded");
+    } catch (error) {
+      setVideoUpload((current) =>
+        current
+          ? {
+              ...current,
+              status: "error",
+              error: error instanceof Error ? error.message : "Upload failed"
+            }
+          : current
+      );
+      toast.error(error instanceof Error ? error.message : "Upload failed");
+    }
+  }
+
+  const imageDropzone = useDropzone({
+    accept: {
+      "image/jpeg": [".jpg", ".jpeg"],
+      "image/png": [".png"],
+      "image/webp": [".webp"]
+    },
+    maxSize: 10 * 1024 * 1024,
+    multiple: true,
+    onDrop: uploadImages,
+    onDropRejected: () => toast.error("Images must be jpg, png, or webp and 10MB or smaller")
+  });
+
+  const videoDropzone = useDropzone({
+    accept: {
+      "video/mp4": [".mp4"],
+      "video/quicktime": [".mov"]
+    },
+    maxSize: 50 * 1024 * 1024,
+    multiple: false,
+    onDrop: uploadVideo,
+    onDropRejected: () => toast.error("Video must be mp4 or mov and 50MB or smaller")
+  });
+
+  function addImageUrl() {
+    if (fields.length >= 8) {
+      toast.error("Use up to 8 images per product");
+      return;
+    }
+
+    try {
+      const url = new URL(urlInput);
+      append({ url: url.toString() });
+      setUrlInput("");
+      toast.success("Image URL added");
+    } catch {
+      toast.error("Enter a valid image URL");
+    }
+  }
 
   async function onSubmit(values: ProductFormValues) {
     const payload = {
@@ -163,38 +349,160 @@ export function ProductForm({
           </label>
         </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold">Image URLs</h2>
+        <section className="space-y-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-sm font-semibold">Product Images</h2>
+              <p className="mt-1 text-xs text-neutral-500">
+                Upload up to 8 jpg, png, or webp images. Each image can be up to 10MB.
+              </p>
+            </div>
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => append({ url: "https://picsum.photos/seed/product/600/600" })}
+              onClick={() => setShowUrlInput((value) => !value)}
             >
-              <Plus size={16} />
-              Add URL
+              <LinkIcon size={16} />
+              Add by URL
             </Button>
           </div>
-          {fields.map((field, index) => (
-            <div key={field.id} className="flex gap-2">
-              <Input {...register(`images.${index}.url`)} />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => fields.length > 1 && remove(index)}
-                aria-label="Remove image URL"
-              >
-                <Trash2 size={16} />
+
+          <div
+            {...imageDropzone.getRootProps()}
+            className={`cursor-pointer rounded-lg border border-dashed p-6 text-center transition ${
+              imageDropzone.isDragActive
+                ? "border-brand-600 bg-brand-50"
+                : "border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900"
+            }`}
+          >
+            <input {...imageDropzone.getInputProps()} />
+            <UploadCloud className="mx-auto text-neutral-500" size={28} />
+            <p className="mt-3 text-sm font-medium">Drag and drop images here</p>
+            <p className="mt-1 text-xs text-neutral-500">or click to choose files</p>
+          </div>
+
+          {showUrlInput ? (
+            <div className="flex gap-2">
+              <Input
+                value={urlInput}
+                onChange={(event) => setUrlInput(event.target.value)}
+                placeholder="https://example.com/product-image.jpg"
+              />
+              <Button variant="secondary" onClick={addImageUrl}>
+                <Plus size={16} />
+                Add
               </Button>
             </div>
-          ))}
-          {errors.images ? <p className="text-xs text-red-600">Add valid image URLs.</p> : null}
-        </div>
+          ) : null}
 
-        <label className="block space-y-1">
-          <span className="text-sm font-medium">Video URL</span>
-          <Input {...register("videoUrl")} placeholder="Optional product video URL" />
-        </label>
+          {uploads.length ? (
+            <div className="space-y-2">
+              {uploads.map((item) => (
+                <div key={item.id} className="flex items-center gap-3 rounded-lg border border-neutral-200 p-3 dark:border-neutral-800">
+                  {item.preview ? (
+                    <img
+                      src={item.preview}
+                      alt=""
+                      className="h-12 w-12 rounded-md object-cover"
+                    />
+                  ) : (
+                    <ImageIcon size={22} className="text-neutral-400" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{item.name}</p>
+                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+                      <div
+                        className={`h-full ${item.status === "error" ? "bg-red-500" : "bg-brand-600"}`}
+                        style={{ width: `${item.progress}%` }}
+                      />
+                    </div>
+                    {item.error ? <p className="mt-1 text-xs text-red-600">{item.error}</p> : null}
+                  </div>
+                  <span className="text-xs font-medium text-neutral-500">{item.progress}%</span>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          {fields.length ? (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {fields.map((field, index) => (
+                <div key={field.id} className="rounded-lg border border-neutral-200 p-3 dark:border-neutral-800">
+                  <input type="hidden" {...register(`images.${index}.url`)} />
+                  <img
+                    src={field.url}
+                    alt=""
+                    className="aspect-square w-full rounded-md object-cover"
+                  />
+                  <p className="mt-2 truncate text-xs text-neutral-500">{field.url}</p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mt-2 w-full"
+                    onClick={() => remove(index)}
+                  >
+                    <Trash2 size={16} />
+                    Remove
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          {errors.images ? <p className="text-xs text-red-600">{errors.images.message}</p> : null}
+        </section>
+
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-sm font-semibold">Product Video</h2>
+            <p className="mt-1 text-xs text-neutral-500">
+              Upload mp4 or mov up to 50MB, or paste a YouTube/Vimeo/Cloudinary URL.
+            </p>
+          </div>
+          <div
+            {...videoDropzone.getRootProps()}
+            className={`cursor-pointer rounded-lg border border-dashed p-5 text-center transition ${
+              videoDropzone.isDragActive
+                ? "border-brand-600 bg-brand-50"
+                : "border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900"
+            }`}
+          >
+            <input {...videoDropzone.getInputProps()} />
+            <Film className="mx-auto text-neutral-500" size={26} />
+            <p className="mt-2 text-sm font-medium">Drop a product video here</p>
+            <p className="mt-1 text-xs text-neutral-500">or click to upload one file</p>
+          </div>
+          {videoUpload ? (
+            <div className="rounded-lg border border-neutral-200 p-3 dark:border-neutral-800">
+              <div className="flex items-center justify-between gap-3">
+                <p className="truncate text-sm font-medium">{videoUpload.name}</p>
+                <span className="text-xs font-medium text-neutral-500">{videoUpload.progress}%</span>
+              </div>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+                <div
+                  className={`h-full ${videoUpload.status === "error" ? "bg-red-500" : "bg-brand-600"}`}
+                  style={{ width: `${videoUpload.progress}%` }}
+                />
+              </div>
+              {videoUpload.error ? (
+                <p className="mt-1 text-xs text-red-600">{videoUpload.error}</p>
+              ) : null}
+            </div>
+          ) : null}
+          <label className="block space-y-1">
+            <span className="text-sm font-medium">Video URL</span>
+            <Input
+              {...register("videoUrl")}
+              placeholder="Optional product video URL"
+              value={videoUrl ?? ""}
+              onChange={(event) =>
+                setValue("videoUrl", event.target.value, { shouldValidate: true })
+              }
+            />
+            {errors.videoUrl ? (
+              <p className="text-xs text-red-600">{errors.videoUrl.message}</p>
+            ) : null}
+          </label>
+        </section>
 
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="flex items-center gap-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">

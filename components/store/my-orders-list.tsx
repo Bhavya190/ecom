@@ -14,7 +14,7 @@ export function MyOrdersList({ orders }: { orders: Order[] }) {
 
   if (!orders.length) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 pb-12 pt-28 sm:px-6 lg:px-8">
         <EmptyState
           title="No orders yet"
           message="Your past orders will appear here once you place one."
@@ -26,8 +26,8 @@ export function MyOrdersList({ orders }: { orders: Order[] }) {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-semibold tracking-tight">My Orders</h1>
+    <div className="mx-auto max-w-5xl px-4 pb-12 pt-28 sm:px-6 lg:px-8">
+      <h1 className="font-display text-4xl font-semibold tracking-tight text-soft-black">My Orders</h1>
       <div className="mt-8 space-y-4">
         {orders.map((order) => {
           const isOpen = openOrder === order.id;

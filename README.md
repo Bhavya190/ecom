@@ -1,12 +1,13 @@
-# Northstar Goods E-Commerce Store
+# Art by Dhruvangi E-Commerce Store
 
-A full-stack small business store built with Next.js 14 App Router, TypeScript, Tailwind CSS, Prisma ORM, NextAuth credentials auth, and PostgreSQL in Docker.
+A full-stack artist storefront for a professional resin artist and drawing artist. Built with Next.js 14 App Router, TypeScript, Tailwind CSS, Prisma ORM, NextAuth credentials auth, Cloudinary uploads, and PostgreSQL in Docker.
 
 ## Prerequisites
 
 - Node.js 18.17 or newer
 - Docker Desktop
 - npm
+- A Cloudinary account for admin image/video uploads
 
 ## Setup
 
@@ -22,31 +23,39 @@ npm install
 cp .env.example .env
 ```
 
-3. Start PostgreSQL:
+3. Add Cloudinary credentials to `.env`:
+
+```bash
+CLOUDINARY_CLOUD_NAME="your-cloud-name"
+CLOUDINARY_API_KEY="your-api-key"
+CLOUDINARY_API_SECRET="your-api-secret"
+```
+
+4. Start PostgreSQL:
 
 ```bash
 docker-compose up -d
 ```
 
-4. Generate Prisma Client:
+5. Generate Prisma Client:
 
 ```bash
 npx prisma generate
 ```
 
-5. Create and apply the database migration:
+6. Create and apply the database migration:
 
 ```bash
 npx prisma migrate dev --name init
 ```
 
-6. Seed categories, products, and the admin account:
+7. Seed the artist categories, demo products, and admin account:
 
 ```bash
 npx prisma db seed
 ```
 
-7. Start the development server:
+8. Start the development server:
 
 ```bash
 npm run dev
@@ -70,6 +79,9 @@ Admin sign-in is available at `http://localhost:3000/admin/login`.
 - `NEXTAUTH_URL`: Public app URL. Use `http://localhost:3000` locally.
 - `ADMIN_EMAIL`: Email for the seeded admin user.
 - `ADMIN_PASSWORD`: Password for the seeded admin user.
+- `CLOUDINARY_CLOUD_NAME`: Cloudinary cloud name for product media uploads.
+- `CLOUDINARY_API_KEY`: Cloudinary API key.
+- `CLOUDINARY_API_SECRET`: Cloudinary API secret.
 
 ## Prisma Commands
 
@@ -82,9 +94,10 @@ npx prisma studio
 
 ## Included Features
 
-- Public storefront with hero, featured products, categories, new arrivals, product search/filter/sort, product details with image gallery and optional video
+- Artist-branded storefront for Art by Dhruvangi with motion, collection colors, masonry browsing, and gallery-style product pages
+- Categories: Jewellery, Photo Frame, Paintings, Broche, Portrait, Rakhi, Diwali, Ring Platter
 - LocalStorage cart for guests and Prisma-backed cart for logged-in customers
 - Guest checkout with Cash on Delivery and online payment placeholder
 - Customer registration, login, and order history
 - Admin dashboard, products, categories, orders, customers, inline product toggles, status updates, and mobile sidebar
-- PostgreSQL Docker Compose setup, Prisma schema, seed data, and NextAuth credentials authentication
+- Cloudinary upload route for product images and video files, with URL fallback in the admin product form

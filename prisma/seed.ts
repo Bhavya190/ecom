@@ -7,6 +7,26 @@ const prisma = new PrismaClient();
 const toSlug = (value: string) =>
   slugify(value, { lower: true, strict: true, trim: true });
 
+const categories = [
+  "Jewellery",
+  "Photo Frame",
+  "Paintings",
+  "Broche",
+  "Portrait",
+  "Rakhi",
+  "Diwali",
+  "Ring Platter"
+];
+
+const legacyDemoProductSlugs = [
+  "novabass-wireless-headphones",
+  "aerocharge-20000mah-power-bank",
+  "lumidesk-smart-led-lamp",
+  "everyday-cotton-tee",
+  "urban-trail-jacket",
+  "harbor-linen-shirt"
+];
+
 async function main() {
   const adminEmail = process.env.ADMIN_EMAIL ?? "admin@example.com";
   const adminPassword = process.env.ADMIN_PASSWORD ?? "Admin123!";
@@ -19,114 +39,146 @@ async function main() {
     },
     create: {
       email: adminEmail,
-      name: "Store Admin",
+      name: "Dhruvangi Admin",
       role: Role.ADMIN,
       password: await bcrypt.hash(adminPassword, 12)
     }
   });
 
-  const electronics = await prisma.category.upsert({
-    where: { slug: "electronics" },
-    update: {},
-    create: {
-      name: "Electronics",
-      slug: "electronics",
-      image: "https://picsum.photos/seed/electronics/600/600"
-    }
+  await prisma.product.deleteMany({
+    where: { slug: { in: legacyDemoProductSlugs } }
   });
 
-  const clothing = await prisma.category.upsert({
-    where: { slug: "clothing" },
-    update: {},
-    create: {
-      name: "Clothing",
-      slug: "clothing",
-      image: "https://picsum.photos/seed/clothing/600/600"
+  for (const legacySlug of ["electronics", "clothing"]) {
+    const legacyCategory = await prisma.category.findUnique({
+      where: { slug: legacySlug },
+      include: { _count: { select: { products: true } } }
+    });
+
+    if (legacyCategory && legacyCategory._count.products === 0) {
+      await prisma.category.delete({ where: { id: legacyCategory.id } });
     }
-  });
+  }
+
+  const categoryRecords = new Map<string, { id: string }>();
+
+  for (const name of categories) {
+    const slug = toSlug(name);
+    const category = await prisma.category.upsert({
+      where: { slug },
+      update: {
+        name,
+        image: `https://picsum.photos/seed/${slug}/600/400`
+      },
+      create: {
+        name,
+        slug,
+        image: `https://picsum.photos/seed/${slug}/600/400`
+      }
+    });
+
+    categoryRecords.set(slug, category);
+  }
 
   const products = [
     {
-      name: "NovaBass Wireless Headphones",
+      name: "Rose Petal Resin Pendant",
       description:
-        "Comfortable over-ear wireless headphones with deep bass, soft cushions, and all-day battery life.",
-      price: 89.99,
-      comparePrice: 129.99,
+        "A delicate handmade pendant with preserved floral tones, soft shimmer, and a glossy resin finish.",
+      price: 32,
+      comparePrice: 42,
+      stock: 12,
+      categorySlug: "jewellery",
+      isFeatured: true
+    },
+    {
+      name: "Ocean Bloom Resin Earrings",
+      description:
+        "Lightweight resin earrings inspired by ocean colors, tiny blooms, and gold-flecked details.",
+      price: 28,
+      comparePrice: 36,
       stock: 18,
-      categoryId: electronics.id,
+      categorySlug: "jewellery",
       isFeatured: true
     },
     {
-      name: "AeroCharge 20000mAh Power Bank",
+      name: "Lavender Resin Flow Canvas",
       description:
-        "Slim portable charger with fast USB-C output, dual-device charging, and travel-ready capacity.",
-      price: 54.5,
-      comparePrice: 69.99,
-      stock: 24,
-      categoryId: electronics.id,
+        "A dreamy abstract resin painting with lavender, blush, mint, and metallic gold movement.",
+      price: 145,
+      comparePrice: 180,
+      stock: 3,
+      categorySlug: "paintings",
+      isFeatured: true
+    },
+    {
+      name: "Golden Tide Mini Painting",
+      description:
+        "A small resin art panel with layered waves, pearlescent texture, and warm gold accents.",
+      price: 78,
+      comparePrice: 96,
+      stock: 5,
+      categorySlug: "paintings",
       isFeatured: false
     },
     {
-      name: "LumiDesk Smart LED Lamp",
+      name: "Charcoal Portrait Study",
       description:
-        "Adjustable desk lamp with touch dimming, warm-to-cool light modes, and a compact base.",
-      price: 42,
-      comparePrice: 58,
+        "A demo portrait artwork showcasing expressive line work, soft shading, and personal detail.",
+      price: 120,
+      comparePrice: 150,
       stock: 4,
-      categoryId: electronics.id,
-      isFeatured: true,
-      videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4"
-    },
-    {
-      name: "Everyday Cotton Tee",
-      description:
-        "Soft breathable cotton T-shirt with a relaxed fit made for daily wear and easy layering.",
-      price: 24,
-      comparePrice: 32,
-      stock: 35,
-      categoryId: clothing.id,
+      categorySlug: "portrait",
       isFeatured: true
     },
     {
-      name: "Urban Trail Jacket",
+      name: "Custom Couple Portrait Demo",
       description:
-        "Lightweight water-resistant jacket with a clean silhouette, zip pockets, and breathable lining.",
-      price: 118,
-      comparePrice: 148,
-      stock: 9,
-      categoryId: clothing.id,
+        "A warm sample portrait piece for custom gifting, anniversaries, and personal keepsakes.",
+      price: 165,
+      comparePrice: 210,
+      stock: 2,
+      categorySlug: "portrait",
       isFeatured: false
-    },
-    {
-      name: "Harbor Linen Shirt",
-      description:
-        "Airy linen-blend button-down shirt with a crisp collar, natural texture, and coastal feel.",
-      price: 64,
-      comparePrice: 78,
-      stock: 16,
-      categoryId: clothing.id,
-      isFeatured: true
     }
   ];
 
   for (const product of products) {
     const slug = toSlug(product.name);
+    const category = categoryRecords.get(product.categorySlug);
+
+    if (!category) {
+      throw new Error(`Missing category ${product.categorySlug}`);
+    }
+
     await prisma.product.upsert({
       where: { slug },
       update: {
-        ...product,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        comparePrice: product.comparePrice,
+        stock: product.stock,
+        categoryId: category.id,
+        isFeatured: product.isFeatured,
         images: [
           `https://picsum.photos/seed/${slug}/600/600`,
-          `https://picsum.photos/seed/${slug}-alt/600/600`
+          `https://picsum.photos/seed/${slug}-detail/600/600`
         ],
         isActive: true
       },
       create: {
-        ...product,
+        name: product.name,
         slug,
+        description: product.description,
+        price: product.price,
+        comparePrice: product.comparePrice,
+        stock: product.stock,
+        categoryId: category.id,
+        isFeatured: product.isFeatured,
         images: [
           `https://picsum.photos/seed/${slug}/600/600`,
-          `https://picsum.photos/seed/${slug}-alt/600/600`
+          `https://picsum.photos/seed/${slug}-detail/600/600`
         ],
         isActive: true
       }

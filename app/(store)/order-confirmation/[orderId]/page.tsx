@@ -34,10 +34,10 @@ export default async function OrderConfirmationPage({
   const address = data.shippingAddress as ShippingAddress;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-4xl px-4 pb-12 pt-28 sm:px-6 lg:px-8">
       <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-950">
         <Badge tone="green">Order Placed</Badge>
-        <h1 className="mt-4 text-3xl font-semibold">Thank you for your order</h1>
+        <h1 className="mt-4 font-display text-4xl font-semibold">Thank you for your order</h1>
         <p className="mt-2 text-neutral-500 dark:text-neutral-400">
           Order number: <span className="font-medium text-neutral-950 dark:text-neutral-50">{data.orderNumber}</span>
         </p>
