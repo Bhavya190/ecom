@@ -19,9 +19,26 @@ const productSchema = z.object({
   isFeatured: z.boolean().default(false)
 });
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const search = searchParams.get("search");
+  const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit")!) : undefined;
+
+  const where = {
+    isActive: true,
+    ...(search
+      ? {
+          OR: [
+            { name: { contains: search, mode: "insensitive" as const } },
+            { description: { contains: search, mode: "insensitive" as const } }
+          ]
+        }
+      : {})
+  };
+
   const products = await prisma.product.findMany({
-    where: { isActive: true },
+    where,
+    take: limit,
     include: { category: true },
     orderBy: { createdAt: "desc" }
   });

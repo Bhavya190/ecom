@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -18,14 +18,15 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/store/cart-provider";
+import { SearchOverlay } from "@/components/store/search-overlay";
 import { ART_CATEGORIES, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/", label: "Home" },
-  { href: "/products", label: "Shop" },
-  { href: "/#about", label: "About" },
-  { href: "/#contact", label: "Contact" }
+  { href: "/products", label: "Products" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" }
 ];
 
 export function StoreNavbar() {
@@ -35,6 +36,7 @@ export function StoreNavbar() {
   const reducedMotion = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [collectionsOpen, setCollectionsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   const transparent = pathname === "/" && !scrolled && !open;
@@ -120,13 +122,14 @@ export function StoreNavbar() {
         </nav>
 
         <div className="flex items-center gap-1.5">
-          <Link
-            href="/products"
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
             className="grid h-10 w-10 place-items-center rounded-full text-charcoal transition hover:bg-white/55"
             title="Search products"
           >
             <Search size={20} />
-          </Link>
+          </button>
           <Link
             href="/cart"
             className="relative grid h-10 w-10 place-items-center rounded-full text-charcoal transition hover:bg-white/55"
@@ -254,6 +257,7 @@ export function StoreNavbar() {
           </motion.div>
         ) : null}
       </AnimatePresence>
+      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </motion.header>
   );
 }

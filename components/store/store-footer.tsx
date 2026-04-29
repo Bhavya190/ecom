@@ -41,15 +41,15 @@ export function StoreFooter() {
 
         <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold md:justify-end">
           <Link href="/products" className="hover:text-[#a85066]">
-            Shop
+            Products
           </Link>
           <Link href="/#collections" className="hover:text-[#a85066]">
             Collections
           </Link>
-          <Link href="/#about" className="hover:text-[#a85066]">
+          <Link href="/about" className="hover:text-[#a85066]">
             About
           </Link>
-          <Link href="/#contact" className="hover:text-[#a85066]">
+          <Link href="/contact" className="hover:text-[#a85066]">
             Contact
           </Link>
           <Link href="/my-orders" className="hover:text-[#a85066]">

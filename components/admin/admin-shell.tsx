@@ -14,7 +14,8 @@ import {
   Package,
   Tags,
   Users,
-  X
+  X,
+  Mail
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -25,10 +26,17 @@ const links = [
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/categories", label: "Categories", icon: Tags },
   { href: "/admin/orders", label: "Orders", icon: ClipboardList },
-  { href: "/admin/customers", label: "Customers", icon: Users }
+  { href: "/admin/customers", label: "Customers", icon: Users },
+  { href: "/admin/inquiries", label: "Inquiries", icon: Mail }
 ];
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export function AdminShell({ 
+  children,
+  unreadInquiriesCount = 0 
+}: { 
+  children: React.ReactNode;
+  unreadInquiriesCount?: number;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -66,14 +74,21 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               href={item.href}
               onClick={() => setOpen(false)}
               className={cn(
-                "flex h-11 items-center gap-3 rounded-md px-3 text-sm font-medium transition",
+                "flex h-11 items-center justify-between rounded-md px-3 text-sm font-medium transition",
                 active
                   ? "bg-brand-50 text-brand-700 dark:bg-brand-950/50 dark:text-brand-100"
                   : "text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900"
               )}
             >
-              <Icon size={18} />
-              {item.label}
+              <div className="flex items-center gap-3">
+                <Icon size={18} />
+                {item.label}
+              </div>
+              {item.href === "/admin/inquiries" && unreadInquiriesCount > 0 && (
+                <span className="grid h-5 min-w-[20px] place-items-center rounded-full bg-brand-600 px-1.5 text-xs font-semibold text-white">
+                  {unreadInquiriesCount}
+                </span>
+              )}
             </Link>
           );
         })}

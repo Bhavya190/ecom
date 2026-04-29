@@ -1,5 +1,16 @@
 import { AdminShell } from "@/components/admin/admin-shell";
+import { isAdminSession } from "@/lib/admin";
+import { prisma } from "@/lib/prisma";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <AdminShell>{children}</AdminShell>;
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  let unreadInquiriesCount = 0;
+  try {
+    if (await isAdminSession()) {
+      unreadInquiriesCount = await prisma.contact.count({ where: { isRead: false } });
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  return <AdminShell unreadInquiriesCount={unreadInquiriesCount}>{children}</AdminShell>;
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Search, ShoppingCart } from "lucide-react";
 
@@ -127,6 +128,27 @@ export function ProductBrowser({
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(initialCategory ?? "all");
   const [sort, setSort] = useState("newest");
+  
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const categoryParam = searchParams.get("category");
+
+  useEffect(() => {
+    setCategory(categoryParam ?? "all");
+  }, [categoryParam]);
+
+  const handleCategoryChange = (newCategory: string) => {
+    setCategory(newCategory);
+    const params = new URLSearchParams(searchParams.toString());
+    if (newCategory === "all") {
+      params.delete("category");
+    } else {
+      params.set("category", newCategory);
+    }
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   const visibleProducts = useMemo(() => {
     const filtered = products.filter((product) => {
@@ -188,7 +210,7 @@ export function ProductBrowser({
         <div className="mb-8 flex gap-3 overflow-x-auto pb-2">
           <button
             type="button"
-            onClick={() => setCategory("all")}
+            onClick={() => handleCategoryChange("all")}
             className={cn(
               "whitespace-nowrap rounded-full border px-4 py-2 text-sm font-bold transition",
               category === "all"
@@ -206,7 +228,7 @@ export function ProductBrowser({
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setCategory(item.slug)}
+                onClick={() => handleCategoryChange(item.slug)}
                 className="whitespace-nowrap rounded-full border px-4 py-2 text-sm font-bold transition"
                 style={{
                   backgroundColor: active ? accent : `${accent}40`,
