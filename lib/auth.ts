@@ -1,16 +1,14 @@
 import type { NextAuthOptions } from "next-auth";
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-
 import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt"
   },
-  pages: {
-    signIn: "/login"
-  },
+  secret: process.env.NEXTAUTH_SECRET || "development-secret-key",
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -19,30 +17,37 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials.password) {
+        if (!credentials?.email || !credentials?.password) {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email.toLowerCase() }
-        });
+        const email = credentials.email.toLowerCase().trim();
+        
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email }
+          });
 
-        if (!user) {
+          if (!user) {
+            return null;
+          }
+
+          const isValid = await bcrypt.compare(credentials.password, user.password);
+
+          if (!isValid) {
+            return null;
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role
+          };
+        } catch (error) {
+          console.error("Error in authorize function:", error);
           return null;
         }
-
-        const isValid = await bcrypt.compare(credentials.password, user.password);
-
-        if (!isValid) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role
-        };
       }
     })
   ],
@@ -52,15 +57,13 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = user.role;
       }
-
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
+      if (session.user && token) {
         session.user.id = token.id as string;
-        session.user.role = token.role as "ADMIN" | "CUSTOMER";
+        session.user.role = (token.role as "ADMIN" | "CUSTOMER") || "CUSTOMER";
       }
-
       return session;
     }
   }

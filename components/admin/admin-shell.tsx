@@ -66,7 +66,7 @@ export function AdminShell({
       <nav className="flex-1 space-y-1 px-3 py-4">
         {links.map((item) => {
           const Icon = item.icon;
-          const active = pathname.startsWith(item.href);
+          const active = pathname?.startsWith(item.href) ?? false;
 
           return (
             <Link

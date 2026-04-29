@@ -1,9 +1,9 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
@@ -11,30 +11,39 @@ import { Input } from "@/components/ui/input";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      if (session.user.role === "ADMIN") {
+        router.replace("/admin/dashboard");
+      } else {
+        router.replace("/");
+      }
+    }
+  }, [status, session, router]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
 
+    const searchParams = new URLSearchParams(window.location.search);
+    const callbackUrl = searchParams.get("callbackUrl") || "/";
+
     const form = new FormData(event.currentTarget);
     const result = await signIn("credentials", {
       email: form.get("email"),
       password: form.get("password"),
-      redirect: false
+      callbackUrl,
+      redirect: true
     });
 
     setLoading(false);
 
     if (result?.error) {
       toast.error("Invalid email or password");
-      return;
     }
-
-    toast.success("Signed in");
-    const callbackUrl = new URLSearchParams(window.location.search).get("callbackUrl");
-    router.push(callbackUrl ?? "/my-orders");
-    router.refresh();
   }
 
   return (
@@ -45,8 +54,8 @@ export default function LoginPage() {
       >
         <h1 className="font-display text-3xl font-semibold">Login</h1>
         <div className="mt-6 space-y-4">
-          <Input name="email" type="email" placeholder="Email" required />
-          <Input name="password" type="password" placeholder="Password" required />
+          <Input name="email" type="email" placeholder="your@email.com" required />
+          <Input name="password" type="password" placeholder="••••••••" required />
         </div>
         <Button type="submit" className="mt-6 w-full" disabled={loading}>
           {loading ? "Signing in..." : "Login"}

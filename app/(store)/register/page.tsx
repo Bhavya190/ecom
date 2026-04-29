@@ -40,13 +40,11 @@ export default function RegisterPage() {
     await signIn("credentials", {
       email: payload.email,
       password: payload.password,
-      redirect: false
+      callbackUrl: "/",
+      redirect: true
     });
 
     setLoading(false);
-    toast.success("Account created");
-    router.push("/my-orders");
-    router.refresh();
   }
 
   return (
