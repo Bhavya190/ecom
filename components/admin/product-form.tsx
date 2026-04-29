@@ -292,7 +292,7 @@ export function ProductForm({
           <h1 className="text-3xl font-semibold tracking-tight">
             {product ? "Edit Product" : "Add New Product"}
           </h1>
-          <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+          <p className="mt-2 text-sm text-neutral-500">
             Slug preview: {slugPreview || "product-slug"}
           </p>
         </div>
@@ -306,7 +306,7 @@ export function ProductForm({
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-6 rounded-lg border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-950"
+        className="space-y-6 rounded-lg border border-neutral-200 bg-white p-5"
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="space-y-1 sm:col-span-2">
@@ -338,7 +338,7 @@ export function ProductForm({
             <span className="text-sm font-medium">Category</span>
             <select
               {...register("categoryId")}
-              className="h-10 w-full rounded-md border border-neutral-200 bg-white px-3 text-sm dark:border-neutral-800 dark:bg-neutral-950"
+              className="h-10 w-full rounded-md border border-neutral-200 bg-white px-3 text-sm"
             >
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
@@ -372,7 +372,7 @@ export function ProductForm({
             className={`cursor-pointer rounded-lg border border-dashed p-6 text-center transition ${
               imageDropzone.isDragActive
                 ? "border-brand-600 bg-brand-50"
-                : "border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900"
+                : "border-neutral-300 bg-neutral-50"
             }`}
           >
             <input {...imageDropzone.getInputProps()} />
@@ -398,7 +398,7 @@ export function ProductForm({
           {uploads.length ? (
             <div className="space-y-2">
               {uploads.map((item) => (
-                <div key={item.id} className="flex items-center gap-3 rounded-lg border border-neutral-200 p-3 dark:border-neutral-800">
+                <div key={item.id} className="flex items-center gap-3 rounded-lg border border-neutral-200 p-3">
                   {item.preview ? (
                     <img
                       src={item.preview}
@@ -410,7 +410,7 @@ export function ProductForm({
                   )}
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{item.name}</p>
-                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-neutral-100">
                       <div
                         className={`h-full ${item.status === "error" ? "bg-red-500" : "bg-brand-600"}`}
                         style={{ width: `${item.progress}%` }}
@@ -427,7 +427,7 @@ export function ProductForm({
           {fields.length ? (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {fields.map((field, index) => (
-                <div key={field.id} className="rounded-lg border border-neutral-200 p-3 dark:border-neutral-800">
+                <div key={field.id} className="rounded-lg border border-neutral-200 p-3">
                   <input type="hidden" {...register(`images.${index}.url`)} />
                   <img
                     src={field.url}
@@ -463,7 +463,7 @@ export function ProductForm({
             className={`cursor-pointer rounded-lg border border-dashed p-5 text-center transition ${
               videoDropzone.isDragActive
                 ? "border-brand-600 bg-brand-50"
-                : "border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900"
+                : "border-neutral-300 bg-neutral-50"
             }`}
           >
             <input {...videoDropzone.getInputProps()} />
@@ -472,12 +472,12 @@ export function ProductForm({
             <p className="mt-1 text-xs text-neutral-500">or click to upload one file</p>
           </div>
           {videoUpload ? (
-            <div className="rounded-lg border border-neutral-200 p-3 dark:border-neutral-800">
+            <div className="rounded-lg border border-neutral-200 p-3">
               <div className="flex items-center justify-between gap-3">
                 <p className="truncate text-sm font-medium">{videoUpload.name}</p>
                 <span className="text-xs font-medium text-neutral-500">{videoUpload.progress}%</span>
               </div>
-              <div className="mt-2 h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-neutral-100">
                 <div
                   className={`h-full ${videoUpload.status === "error" ? "bg-red-500" : "bg-brand-600"}`}
                   style={{ width: `${videoUpload.progress}%` }}
@@ -505,11 +505,11 @@ export function ProductForm({
         </section>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <label className="flex items-center gap-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+          <label className="flex items-center gap-3 rounded-lg border border-neutral-200 p-4">
             <input type="checkbox" {...register("isActive")} />
             <span className="text-sm font-medium">Active</span>
           </label>
-          <label className="flex items-center gap-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+          <label className="flex items-center gap-3 rounded-lg border border-neutral-200 p-4">
             <input type="checkbox" {...register("isFeatured")} />
             <span className="text-sm font-medium">Featured</span>
           </label>

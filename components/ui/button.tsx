@@ -11,9 +11,9 @@ const variants = {
   primary:
     "bg-brand-600 text-white hover:bg-brand-700 focus-visible:outline-brand-600",
   secondary:
-    "border border-neutral-200 bg-white text-neutral-950 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-50 dark:hover:bg-neutral-800",
+    "border border-neutral-200 bg-white text-neutral-950 hover:bg-neutral-50",
   ghost:
-    "text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-900",
+    "text-neutral-700 hover:bg-neutral-100",
   danger:
     "bg-red-600 text-white hover:bg-red-700 focus-visible:outline-red-600"
 };

@@ -35,7 +35,7 @@ export function MyOrdersList({ orders }: { orders: Order[] }) {
           return (
             <article
               key={order.id}
-              className="rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950"
+              className="rounded-lg border border-neutral-200 bg-white"
             >
               <button
                 type="button"
@@ -44,7 +44,7 @@ export function MyOrdersList({ orders }: { orders: Order[] }) {
               >
                 <div>
                   <p className="font-semibold">{order.orderNumber}</p>
-                  <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                  <p className="mt-1 text-sm text-neutral-500">
                     {new Date(order.createdAt).toLocaleDateString()}
                   </p>
                 </div>
@@ -56,13 +56,13 @@ export function MyOrdersList({ orders }: { orders: Order[] }) {
                 />
               </button>
               {isOpen ? (
-                <div className="border-t border-neutral-100 p-5 dark:border-neutral-800">
+                <div className="border-t border-neutral-100 p-5">
                   <div className="space-y-3">
                     {order.items.map((item) => (
                       <div key={item.id} className="flex justify-between gap-4 text-sm">
                         <div>
                           <p className="font-medium">{item.productName}</p>
-                          <p className="text-neutral-500 dark:text-neutral-400">
+                          <p className="text-neutral-500">
                             Qty {item.quantity}
                           </p>
                         </div>

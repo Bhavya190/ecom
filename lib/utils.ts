@@ -13,9 +13,9 @@ export function makeSlug(value: string) {
 export function formatPrice(value: number | string) {
   const amount = typeof value === "string" ? Number(value) : value;
 
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: "USD"
+    currency: "INR"
   }).format(amount);
 }
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangle, DollarSign, Package, ShoppingBag, Users } from "lucide-react";
+import { AlertTriangle, IndianRupee, Package, ShoppingBag, Users } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
@@ -29,7 +29,7 @@ export default async function AdminDashboardPage() {
 
   const kpis = [
     { label: "Total Orders", value: totalOrders, icon: ShoppingBag },
-    { label: "Total Revenue", value: formatPrice(Number(revenue._sum.totalAmount ?? 0)), icon: DollarSign },
+    { label: "Total Revenue", value: formatPrice(Number(revenue._sum.totalAmount ?? 0)), icon: IndianRupee },
     { label: "Total Products", value: totalProducts, icon: Package },
     { label: "Total Customers", value: totalCustomers, icon: Users }
   ];
@@ -38,7 +38,7 @@ export default async function AdminDashboardPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
-        <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+        <p className="mt-2 text-sm text-neutral-500">
           Store health, orders, and stock at a glance.
         </p>
       </div>
@@ -50,10 +50,10 @@ export default async function AdminDashboardPage() {
           return (
             <div
               key={item.label}
-              className="rounded-lg border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-950"
+              className="rounded-lg border border-neutral-200 bg-white p-5"
             >
               <div className="flex items-center justify-between">
-                <p className="text-sm text-neutral-500 dark:text-neutral-400">{item.label}</p>
+                <p className="text-sm text-neutral-500">{item.label}</p>
                 <Icon size={20} className="text-brand-700" />
               </div>
               <p className="mt-4 text-2xl font-semibold">{item.value}</p>
@@ -63,13 +63,13 @@ export default async function AdminDashboardPage() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
-        <section className="rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
-          <div className="border-b border-neutral-200 p-5 dark:border-neutral-800">
+        <section className="rounded-lg border border-neutral-200 bg-white">
+          <div className="border-b border-neutral-200 p-5">
             <h2 className="text-lg font-semibold">Recent Orders</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] text-sm">
-              <thead className="bg-neutral-50 text-left text-neutral-500 dark:bg-neutral-900 dark:text-neutral-400">
+              <thead className="bg-neutral-50 text-left text-neutral-500">
                 <tr>
                   <th className="px-5 py-3 font-medium">Order</th>
                   <th className="px-5 py-3 font-medium">Customer</th>
@@ -78,7 +78,7 @@ export default async function AdminDashboardPage() {
                   <th className="px-5 py-3 font-medium">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+              <tbody className="divide-y divide-neutral-100">
                 {recentOrders.map((order) => (
                   <tr key={order.id}>
                     <td className="px-5 py-4">
@@ -99,7 +99,7 @@ export default async function AdminDashboardPage() {
           </div>
         </section>
 
-        <section className="rounded-lg border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-950">
+        <section className="rounded-lg border border-neutral-200 bg-white p-5">
           <div className="flex items-center gap-2">
             <AlertTriangle size={20} className="text-amber-600" />
             <h2 className="text-lg font-semibold">Low Stock</h2>
@@ -110,13 +110,13 @@ export default async function AdminDashboardPage() {
                 <div key={product.id} className="flex items-center justify-between gap-3 text-sm">
                   <div>
                     <p className="font-medium">{product.name}</p>
-                    <p className="text-neutral-500 dark:text-neutral-400">{product.category.name}</p>
+                    <p className="text-neutral-500">{product.category.name}</p>
                   </div>
                   <Badge tone={product.stock === 0 ? "red" : "amber"}>{product.stock}</Badge>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">No low stock items.</p>
+              <p className="text-sm text-neutral-500">No low stock items.</p>
             )}
           </div>
         </section>

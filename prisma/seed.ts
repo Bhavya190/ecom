@@ -85,8 +85,8 @@ async function main() {
       name: "Rose Petal Resin Pendant",
       description:
         "A delicate handmade pendant with preserved floral tones, soft shimmer, and a glossy resin finish.",
-      price: 32,
-      comparePrice: 42,
+      price: 2656,
+      comparePrice: 3486,
       stock: 12,
       categorySlug: "jewellery",
       isFeatured: true
@@ -95,8 +95,8 @@ async function main() {
       name: "Ocean Bloom Resin Earrings",
       description:
         "Lightweight resin earrings inspired by ocean colors, tiny blooms, and gold-flecked details.",
-      price: 28,
-      comparePrice: 36,
+      price: 2324,
+      comparePrice: 2988,
       stock: 18,
       categorySlug: "jewellery",
       isFeatured: true
@@ -105,8 +105,8 @@ async function main() {
       name: "Lavender Resin Flow Canvas",
       description:
         "A dreamy abstract resin painting with lavender, blush, mint, and metallic gold movement.",
-      price: 145,
-      comparePrice: 180,
+      price: 12035,
+      comparePrice: 14940,
       stock: 3,
       categorySlug: "paintings",
       isFeatured: true
@@ -115,8 +115,8 @@ async function main() {
       name: "Golden Tide Mini Painting",
       description:
         "A small resin art panel with layered waves, pearlescent texture, and warm gold accents.",
-      price: 78,
-      comparePrice: 96,
+      price: 6474,
+      comparePrice: 7968,
       stock: 5,
       categorySlug: "paintings",
       isFeatured: false
@@ -125,8 +125,8 @@ async function main() {
       name: "Charcoal Portrait Study",
       description:
         "A demo portrait artwork showcasing expressive line work, soft shading, and personal detail.",
-      price: 120,
-      comparePrice: 150,
+      price: 9960,
+      comparePrice: 12450,
       stock: 4,
       categorySlug: "portrait",
       isFeatured: true
@@ -135,8 +135,8 @@ async function main() {
       name: "Custom Couple Portrait Demo",
       description:
         "A warm sample portrait piece for custom gifting, anniversaries, and personal keepsakes.",
-      price: 165,
-      comparePrice: 210,
+      price: 13695,
+      comparePrice: 17430,
       stock: 2,
       categorySlug: "portrait",
       isFeatured: false

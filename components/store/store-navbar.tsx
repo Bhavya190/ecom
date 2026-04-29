@@ -10,10 +10,8 @@ import { signOut, useSession } from "next-auth/react";
 import {
   ChevronDown,
   Menu,
-  Moon,
   Search,
   ShoppingCart,
-  Sun,
   UserRound,
   X
 } from "lucide-react";
@@ -37,19 +35,10 @@ export function StoreNavbar() {
   const reducedMotion = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [collectionsOpen, setCollectionsOpen] = useState(false);
-  const [dark, setDark] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   const transparent = pathname === "/" && !scrolled && !open;
 
-  useEffect(() => {
-    const stored = window.localStorage.getItem("theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const shouldDark = stored ? stored === "dark" : prefersDark;
-
-    setDark(shouldDark);
-    document.documentElement.classList.toggle("dark", shouldDark);
-  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -59,12 +48,6 @@ export function StoreNavbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  function toggleTheme() {
-    const next = !dark;
-    setDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    window.localStorage.setItem("theme", next ? "dark" : "light");
-  }
 
   return (
     <motion.header
@@ -74,7 +57,7 @@ export function StoreNavbar() {
         boxShadow: transparent ? "0 0 0 rgba(0,0,0,0)" : "0 12px 40px rgba(45,45,45,0.08)"
       }}
       transition={{ duration: reducedMotion ? 0 : 0.25 }}
-      className="fixed inset-x-0 top-0 z-50 border-b border-white/30 backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-950/90"
+      className="fixed inset-x-0 top-0 z-50 border-b border-white/30 backdrop-blur-md"
     >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-3">
@@ -86,14 +69,14 @@ export function StoreNavbar() {
           <span
             className={cn(
               "hidden font-display text-xl font-semibold tracking-wide sm:block",
-              transparent ? "text-soft-black" : "text-charcoal dark:text-neutral-50"
+              transparent ? "text-soft-black" : "text-charcoal"
             )}
           >
             {BRAND_NAME}
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-7 text-sm font-semibold text-charcoal/80 dark:text-neutral-200 lg:flex">
+        <nav className="hidden items-center gap-7 text-sm font-semibold text-charcoal/80 lg:flex">
           {navItems.map((item) => (
             <Link key={item.href} href={item.href} className="transition hover:text-[#a85066]">
               {item.label}
@@ -118,7 +101,7 @@ export function StoreNavbar() {
                   initial={reducedMotion ? false : { opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 8 }}
-                  className="absolute left-1/2 top-9 grid w-72 -translate-x-1/2 grid-cols-2 gap-2 rounded-2xl border border-white/60 bg-cream/95 p-3 shadow-art backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95"
+                  className="absolute left-1/2 top-9 grid w-72 -translate-x-1/2 grid-cols-2 gap-2 rounded-2xl border border-white/60 bg-cream/95 p-3 shadow-art backdrop-blur"
                 >
                   {ART_CATEGORIES.map((category) => (
                     <Link
@@ -139,22 +122,14 @@ export function StoreNavbar() {
         <div className="flex items-center gap-1.5">
           <Link
             href="/products"
-            className="grid h-10 w-10 place-items-center rounded-full text-charcoal transition hover:bg-white/55 dark:text-neutral-200 dark:hover:bg-neutral-900"
+            className="grid h-10 w-10 place-items-center rounded-full text-charcoal transition hover:bg-white/55"
             title="Search products"
           >
             <Search size={20} />
           </Link>
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="grid h-10 w-10 place-items-center rounded-full text-charcoal transition hover:bg-white/55 dark:text-neutral-200 dark:hover:bg-neutral-900"
-            title={dark ? "Light mode" : "Dark mode"}
-          >
-            {dark ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
           <Link
             href="/cart"
-            className="relative grid h-10 w-10 place-items-center rounded-full text-charcoal transition hover:bg-white/55 dark:text-neutral-200 dark:hover:bg-neutral-900"
+            className="relative grid h-10 w-10 place-items-center rounded-full text-charcoal transition hover:bg-white/55"
             title="Cart"
           >
             <ShoppingCart size={20} />
@@ -176,7 +151,7 @@ export function StoreNavbar() {
             <button
               type="button"
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="hidden h-10 items-center gap-2 rounded-full border border-white/60 bg-white/45 px-3 text-sm font-semibold text-charcoal transition hover:bg-white/75 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200 sm:flex"
+              className="hidden h-10 items-center gap-2 rounded-full border border-white/60 bg-white/45 px-3 text-sm font-semibold text-charcoal transition hover:bg-white/75 sm:flex"
             >
               <UserRound size={18} />
               Account
@@ -184,7 +159,7 @@ export function StoreNavbar() {
           ) : (
             <Link
               href="/login"
-              className="hidden h-10 items-center gap-2 rounded-full border border-white/60 bg-white/45 px-3 text-sm font-semibold text-charcoal transition hover:bg-white/75 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200 sm:flex"
+              className="hidden h-10 items-center gap-2 rounded-full border border-white/60 bg-white/45 px-3 text-sm font-semibold text-charcoal transition hover:bg-white/75 sm:flex"
             >
               <UserRound size={18} />
               Login
@@ -208,7 +183,7 @@ export function StoreNavbar() {
             initial={reducedMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 top-0 z-50 bg-cream/98 px-6 py-6 backdrop-blur-xl dark:bg-neutral-950/98 lg:hidden"
+            className="fixed inset-0 top-0 z-50 bg-cream/98 px-6 py-6 backdrop-blur-xl lg:hidden"
           >
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
@@ -244,7 +219,7 @@ export function StoreNavbar() {
                 >
                   <Link
                     href={item.href}
-                    className="font-display text-4xl font-semibold text-soft-black dark:text-neutral-50"
+                    className="font-display text-4xl font-semibold text-soft-black"
                     onClick={() => setOpen(false)}
                   >
                     {item.label}
@@ -258,7 +233,7 @@ export function StoreNavbar() {
                 }}
                 className="pt-4"
               >
-                <p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-charcoal/55 dark:text-neutral-400">
+                <p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-charcoal/55">
                   Collections
                 </p>
                 <div className="grid grid-cols-2 gap-2">

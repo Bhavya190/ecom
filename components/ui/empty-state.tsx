@@ -9,11 +9,11 @@ type EmptyStateProps = {
 
 export function EmptyState({ title, message, href, action }: EmptyStateProps) {
   return (
-    <div className="flex min-h-72 flex-col items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-white p-8 text-center dark:border-neutral-800 dark:bg-neutral-950">
-      <h2 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
+    <div className="flex min-h-72 flex-col items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-white p-8 text-center">
+      <h2 className="text-xl font-semibold text-neutral-950">
         {title}
       </h2>
-      <p className="mt-2 max-w-md text-sm text-neutral-500 dark:text-neutral-400">
+      <p className="mt-2 max-w-md text-sm text-neutral-500">
         {message}
       </p>
       {href && action ? (
