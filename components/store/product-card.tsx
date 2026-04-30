@@ -64,7 +64,8 @@ export function ProductCard({
   return (
     <motion.article
       layout
-      whileHover={reducedMotion ? undefined : { scale: 1.03, y: -6 }}
+      whileHover={reducedMotion ? undefined : { scale: 1.02, y: -4 }}
+      whileTap={reducedMotion ? undefined : { scale: 0.985 }}
       transition={{ type: "spring", stiffness: 260, damping: 24 }}
       className={cn(
         "group relative overflow-hidden rounded-[20px] bg-white shadow-soft",
@@ -84,7 +85,7 @@ export function ProductCard({
         priority={imagePriority}
         className="object-cover transition duration-500 group-hover:scale-110"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/12 to-transparent opacity-85 transition group-hover:opacity-95" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/72 via-black/12 to-transparent opacity-85 transition group-hover:opacity-95" />
       {disabled ? (
         <div className="absolute left-4 top-4 z-20">
           <Badge tone="red">Out of Stock</Badge>
@@ -94,7 +95,7 @@ export function ProductCard({
           <Badge tone="green">Featured</Badge>
         </div>
       ) : null}
-      <div className="absolute inset-x-0 bottom-0 z-20 p-5 text-white">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 translate-y-4 p-5 text-white opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
         {product.category ? (
           <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/80">
             <span
@@ -104,7 +105,7 @@ export function ProductCard({
             {product.category.name}
           </div>
         ) : null}
-        <h3 className="product-name text-2xl font-semibold leading-tight">
+        <h3 className="product-name line-clamp-2 text-lg font-bold leading-tight">
           {product.name}
         </h3>
         <div className="mt-3 flex items-baseline gap-2">
@@ -124,7 +125,7 @@ export function ProductCard({
             event.stopPropagation();
             handleAddToCart();
           }}
-          className="mt-4 inline-flex h-11 translate-y-3 items-center gap-2 rounded-full bg-cream px-4 text-sm font-bold text-charcoal opacity-0 shadow-lg transition group-hover:translate-y-0 group-hover:opacity-100 disabled:pointer-events-none disabled:opacity-60"
+          className="pointer-events-auto mt-4 inline-flex h-11 items-center gap-2 rounded-full bg-cream px-4 text-sm font-bold text-charcoal shadow-lg transition duration-300 disabled:pointer-events-none disabled:opacity-60"
         >
           <ShoppingCart size={17} />
           Add to Cart

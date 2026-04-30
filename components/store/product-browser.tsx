@@ -102,7 +102,7 @@ function MasonryProductCard({
                   stock: product.stock
                 });
               }}
-              className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-cream text-charcoal disabled:opacity-50"
+              className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-cream text-charcoal transition-opacity group-hover:disabled:opacity-50"
               aria-label="Add to cart"
             >
               <ShoppingCart size={18} />
