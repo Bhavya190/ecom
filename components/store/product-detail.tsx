@@ -192,11 +192,11 @@ export function ProductDetail({ product }: { product: StoreProduct }) {
                 {product.category.name}
               </span>
             ) : null}
-            <h1 className="mt-5 font-display text-5xl font-semibold leading-tight text-soft-black">
+            <h1 className="mt-5 font-display text-3xl font-bold leading-tight text-soft-black">
               {product.name}
             </h1>
             <div className="mt-5 flex items-baseline gap-3">
-              <span className="font-body text-4xl font-bold text-gold">
+              <span className="font-body text-2xl font-bold text-gold">
                 {formatPrice(product.price)}
               </span>
               {product.comparePrice ? (
@@ -205,7 +205,7 @@ export function ProductDetail({ product }: { product: StoreProduct }) {
                 </span>
               ) : null}
             </div>
-            <p className="mt-6 text-lg leading-8 text-charcoal/72">{product.description}</p>
+            <p className="mt-6 text-base leading-7 text-charcoal/72">{product.description}</p>
             <div className="mt-6">
               {inStock ? (
                 <Badge tone={product.stock < 5 ? "amber" : "green"}>

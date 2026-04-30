@@ -48,6 +48,7 @@ function MasonryProductCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 18 }}
       transition={{ duration: 0.28, ease: "easeOut" }}
+      whileTap={reducedMotion ? undefined : { scale: 0.985 }}
       className="mb-5 break-inside-avoid"
     >
       <div
@@ -67,12 +68,14 @@ function MasonryProductCard({
           sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className="object-cover transition duration-500 group-hover:scale-110"
         />
-        <div className="absolute inset-x-0 bottom-0 z-20 translate-y-8 bg-gradient-to-t from-black/86 via-black/55 to-transparent p-5 pt-20 text-white opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 translate-y-8 bg-gradient-to-t from-black/86 via-black/55 to-transparent p-5 pt-20 text-white opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
           <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-white/75">
             <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: accent }} />
             {product.category?.name}
           </div>
-          <h3 className="product-name text-2xl font-semibold leading-tight">{product.name}</h3>
+          <h3 className="product-name line-clamp-2 text-lg font-bold leading-tight">
+            {product.name}
+          </h3>
           <div className="mt-3 flex items-center justify-between gap-3">
             <div className="flex items-baseline gap-2">
               <span className="font-bold">{formatPrice(product.price)}</span>
@@ -99,7 +102,7 @@ function MasonryProductCard({
                   stock: product.stock
                 });
               }}
-              className="grid h-10 w-10 place-items-center rounded-full bg-cream text-charcoal disabled:opacity-50"
+              className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-cream text-charcoal disabled:opacity-50"
               aria-label="Add to cart"
             >
               <ShoppingCart size={18} />
@@ -133,7 +136,7 @@ export function ProductBrowser({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const categoryParam = searchParams.get("category");
+  const categoryParam = searchParams?.get("category");
 
   useEffect(() => {
     setCategory(categoryParam ?? "all");
@@ -141,7 +144,7 @@ export function ProductBrowser({
 
   const handleCategoryChange = (newCategory: string) => {
     setCategory(newCategory);
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() ?? "");
     if (newCategory === "all") {
       params.delete("category");
     } else {
