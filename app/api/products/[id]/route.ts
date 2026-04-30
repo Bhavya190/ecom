@@ -5,6 +5,8 @@ import { isAdminSession } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { makeSlug } from "@/lib/utils";
 
+import { revalidatePath } from "next/cache";
+
 const updateProductSchema = z.object({
   name: z.string().min(2),
   description: z.string().min(10),
@@ -44,6 +46,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
   });
 
+  revalidatePath("/");
+  revalidatePath("/products");
+
   return NextResponse.json({ product });
 }
 
@@ -64,6 +69,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     data: parsed.data
   });
 
+  revalidatePath("/");
+  revalidatePath("/products");
+
   return NextResponse.json({ product });
 }
 
@@ -73,6 +81,9 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
   }
 
   await prisma.product.delete({ where: { id: params.id } });
+
+  revalidatePath("/");
+  revalidatePath("/products");
 
   return NextResponse.json({ ok: true });
 }

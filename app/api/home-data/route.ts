@@ -9,7 +9,7 @@ export async function GET() {
         where: { isActive: true, isFeatured: true },
         include: { category: true },
         orderBy: { createdAt: "desc" },
-        take: 4
+        take: 8
       }),
       prisma.category.findMany({
         include: { _count: { select: { products: true } } },

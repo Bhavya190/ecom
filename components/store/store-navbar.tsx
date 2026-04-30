@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/store/cart-provider";
 import { SearchOverlay } from "@/components/store/search-overlay";
-import { ART_CATEGORIES, BRAND_NAME } from "@/lib/brand";
+import { BRAND_NAME, categoryAccent } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -38,9 +38,9 @@ export function StoreNavbar() {
   const [collectionsOpen, setCollectionsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [categories, setCategories] = useState<{ name: string; slug: string }[]>([]);
 
   const transparent = pathname === "/" && !scrolled && !open;
-
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -50,6 +50,20 @@ export function StoreNavbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("/api/categories");
+        const data = await response.json();
+        if (data.categories) {
+          setCategories(data.categories);
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   return (
     <motion.header
@@ -105,12 +119,12 @@ export function StoreNavbar() {
                   exit={{ opacity: 0, y: 8 }}
                   className="absolute left-1/2 top-9 grid w-72 -translate-x-1/2 grid-cols-2 gap-2 rounded-2xl border border-white/60 bg-cream/95 p-3 shadow-art backdrop-blur"
                 >
-                  {ART_CATEGORIES.map((category) => (
+                  {categories.map((category) => (
                     <Link
                       key={category.slug}
                       href={`/products?category=${category.slug}`}
                       className="rounded-xl px-3 py-2 text-sm transition hover:shadow-sm"
-                      style={{ backgroundColor: `${category.accent}40` }}
+                      style={{ backgroundColor: `${categoryAccent(category.slug)}40` }}
                     >
                       {category.name}
                     </Link>
@@ -240,13 +254,13 @@ export function StoreNavbar() {
                   Collections
                 </p>
                 <div className="grid grid-cols-2 gap-2">
-                  {ART_CATEGORIES.map((category) => (
+                  {categories.map((category) => (
                     <Link
                       key={category.slug}
                       href={`/products?category=${category.slug}`}
                       onClick={() => setOpen(false)}
                       className="rounded-2xl px-4 py-3 text-sm font-semibold"
-                      style={{ backgroundColor: `${category.accent}55` }}
+                      style={{ backgroundColor: `${categoryAccent(category.slug)}55` }}
                     >
                       {category.name}
                     </Link>

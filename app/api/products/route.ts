@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma";
 import { serializeProduct } from "@/lib/serializers";
 import { makeSlug } from "@/lib/utils";
 
+import { revalidatePath } from "next/cache";
+
 const productSchema = z.object({
   name: z.string().min(2),
   description: z.string().min(10),
@@ -65,6 +67,9 @@ export async function POST(request: Request) {
       videoUrl: parsed.data.videoUrl || null
     }
   });
+
+  revalidatePath("/");
+  revalidatePath("/products");
 
   return NextResponse.json({ product });
 }

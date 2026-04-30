@@ -5,6 +5,8 @@ import { isAdminSession } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { makeSlug } from "@/lib/utils";
 
+import { revalidatePath } from "next/cache";
+
 const categorySchema = z.object({
   name: z.string().min(2),
   image: z.string().url()
@@ -31,6 +33,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
   });
 
+  revalidatePath("/");
+  revalidatePath("/products");
+
   return NextResponse.json({ category });
 }
 
@@ -49,6 +54,9 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
   }
 
   await prisma.category.delete({ where: { id: params.id } });
+
+  revalidatePath("/");
+  revalidatePath("/products");
 
   return NextResponse.json({ ok: true });
 }
