@@ -52,7 +52,7 @@ export function HomePageWrapper({
     if (initialFeaturedProducts.length > 0 || initialCategories.length > 0) {
       refreshData();
     }
-  }, []);
+  }, [initialFeaturedProducts.length, initialCategories.length]);
 
   return (
     <HomePageClient
