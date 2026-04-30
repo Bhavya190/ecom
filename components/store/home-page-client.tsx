@@ -213,21 +213,18 @@ export function HomePageClient({
             </p>
           </div>
           <div className="grid gap-5 lg:grid-cols-4">
-            {safeFeaturedProducts.map((product, index) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                large={index === 0 || index === 3}
-                imagePriority={index === 0}
-                className={
-                  index === 0
-                    ? "lg:col-span-2"
-                    : index === 3
-                      ? "lg:col-span-2"
-                      : "lg:col-span-1"
-                }
-              />
-            ))}
+            {safeFeaturedProducts.map((product, index) => {
+              const isLarge = index % 6 === 0 || index % 6 === 5;
+              return (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  large={isLarge}
+                  imagePriority={index === 0}
+                  className={isLarge ? "lg:col-span-2" : "lg:col-span-1"}
+                />
+              );
+            })}
           </div>
         </div>
       </SectionReveal>
