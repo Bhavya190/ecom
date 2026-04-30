@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { v2 as cloudinary, type UploadApiResponse } from "cloudinary";
+import { type UploadApiResponse } from "cloudinary";
+import cloudinary from "@/lib/cloudinary";
 
 import { isAdminSession } from "@/lib/admin";
 
@@ -46,12 +47,6 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-  });
 
   const formData = await request.formData();
   const file = formData.get("file");
